@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title> Weather App</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div class="card">
+    <div class="search">
+        <input type="text" placeholder="Enter City Name" spellcheck="false">
+        <button><img src="images/search.png" alt=""></button>
+    </div>
+
+    <div class="error">
+        <p>Invalid City Name</p>
+    </div>
+    
+<div class="weather">
+        <img src="images/rain.png" class="weather-icon">
+        <h1 class="temp">22°c</h1>
+        <h2 class="city">New York</h2>
+        
+        <div class="details">
+            
+            <div class="col">
+                <img src="images/humidity.png">
+                <div>
+                    <p class="humidity">50%</p>
+                    <p>Humidity</p>
+                </div>
+            </div>
+
+            <div class="col">
+                <img src="images/wind.png">
+                <div>
+                    <p class="wind">15 Km/h</p>
+                    <p>Wind Speed</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+
+//Declare variables
+const apiKey = "bbf75a0580ba834701cda943a54d44e5";
+const apiUrl = "https://api.openweathermap.org/data/2.5/weather?units=metric&q=";
+
+const searchBox = document.querySelector(".search input");
+const searchBtn = document.querySelector(".search button");
+const weatherIcon = document.querySelector(".weather-icon");
+
+
+//Async function which brings us the data from our API
+async function checkWeather(city){
+    const response = await fetch(apiUrl + city + `&appid=${apiKey}`);   //searchBox.value from below is "city" which is the valur our function runs with, " + city" here is the same
+    
+
+//Set up a way to deal an error message for invalid city name, so when the status is NOT equal to 404(invalid) it WILL update the data
+if(response.status == 404){
+        document.querySelector(".error").style.display = "block";
+        document.querySelector(".weather").style.display = "none";
+}   else{
+//data variable is the JSON response
+    var data = await response.json();
+    
+
+//Update the HTML based off the JSON data we get as well as add approriate strings and rounding numbers
+    document.querySelector(".city").innerHTML = data.name;
+    document.querySelector(".temp").innerHTML = Math.round(data.main.temp) + "°c";
+    document.querySelector(".humidity").innerHTML = data.main.humidity + "%";
+    document.querySelector(".wind").innerHTML = Math.round(data.wind.speed) + "km/h";
+
+// To change icons for weather conditions, use if statement with the data coming in from the JSON
+    if(data.weather[0].main == "Clouds") {
+        weatherIcon.src = "images/clouds.png"
+    }
+    else if (data.weather[0].main == "Clear"){
+        weatherIcon.src = "images/clear.png"
+    }
+    else if (data.weather[0].main == "Rain"){
+        weatherIcon.src = "images/rain.png"
+    }
+    else if (data.weather[0].main == "Drizzle"){
+        weatherIcon.src = "images/drizzle.png"
+    }
+    else if (data.weather[0].main == "Mist"){
+        weatherIcon.src = "images/mist.png"
+    }
+
+//Update the CSS to show something since we set it to none by default to avoid showing any info when the page first loads
+    document.querySelector(".weather").style.display ="block";
+//Hide the error message if we DO get a valid city name response from above (the else statement is triggered)
+    document.querySelector(".error").style.display = "none";
+    
+    }
+
+    
+}
+
+// We get input and button declared above for our JS, we do event listener so every click runs this function with the value in our searchbox (city)
+searchBtn.addEventListener("click", ()=>{
+    checkWeather(searchBox.value);
+})
+
+
+checkWeather()
+</script>
+
+</body>
+</html>
